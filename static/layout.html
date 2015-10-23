@@ -1,0 +1,33 @@
+<!doctype html>
+<head>
+    <title> CUBNB</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CUBNB.css') }}">
+</head>
+
+<body>
+	<div class="wrapper">	
+		<div class= "homeheader">
+
+		 <div class="metanav">
+  			{% if not session.logged_in %}
+    		<a href="{{ url_for('login') }}">log in</a>
+ 			 {% else %}
+  		  <a href="{{ url_for('logout') }}">log out</a>
+  			{% endif %}
+ 		 </div>
+ 		{% block header %}{% endblock %}
+		</div>
+
+		<div class="home_message">
+			<p class="home.p">WHAT ARE YOU LOOKING FOR?</p>
+
+			<!--link to HOST page-->
+			<p class="home.p"> <a href="{{ url_for('host') }}"> HOST</a></p>
+			<br>
+			<!--link to STAY page-->
+			<p class="home.p"> <a href="{{ url_for('host') }}"> STAY</a></p>
+		</div>	
+
+		{% block body %} {% end block %}
+	</div>
+</body>
