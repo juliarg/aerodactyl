@@ -1,4 +1,4 @@
 # aerodactyl
 # mrmime
 
-A website to facilitate temporary housing and storage for the Columbia University undergrad community.
+A website helping Columbia University students find and share temporary housing and storage space.
