@@ -27,11 +27,13 @@ def user_signup():
     data = json.loads(signup_data)
     username = data['username']
     password = data['password']
+    email = data['email']
     connection = httplib.HTTPSConnection('api.parse.com', 443)
     connection.connect()
     connection.request('POST', '/1/users', json.dumps({
         "username": username,
         "password": password,
+        "email": email,
     }), {
         "X-Parse-Application-Id": parse_app_id,
         "X-Parse-REST-API-Key": parse_app_key,

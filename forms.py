@@ -13,6 +13,12 @@ def email_exists(form, field):
 	if User.select().where(User.email == field.data).exists():
 		raise ValidationError('Email already exists.')
 
+def is_university_email(form, field): 
+	# domain = field.data.split('@') # domain is an array of two strings -- before and after the @ symbol
+	if ("columbia.edu" not in field.data) and ("barnard.edu" not in field.data): 
+		raise ValidationError('Please enter a valid @columbia.edu or @barnard.edu address.')
+
+
 class RegisterForm(Form):
 	username = StringField(
 		'Username',
@@ -30,7 +36,8 @@ class RegisterForm(Form):
 		validators=[
 			DataRequired(),
 			Email(),
-			email_exists
+			email_exists,
+			is_university_email
 		])
 	password = PasswordField(
 		'Password', 
