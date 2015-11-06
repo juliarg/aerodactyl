@@ -1,4 +1,5 @@
 from flask import (Flask, g, render_template, flash, redirect, url_for)
+from flask import jsonify, request
 from flask.ext.bcrypt import check_password_hash
 from flask.ext.login import LoginManager, login_user
 
@@ -10,6 +11,8 @@ PORT = 8000
 HOST = '0.0.0.0'
 
 app = Flask(__name__)
+# parse_app_id = "#########"
+# parse_app_key = "#########"
 app.secret_key = 'sldkjsgifodji2o54389dxnkcklkefer'
 
 login_manager = LoginManager()
@@ -24,13 +27,12 @@ def load_user(userid):
 	except models.DoesNotExist:
 		return None
 
-#janine
+# I am not sure that we need this bit! Parse might just take care of it. 
 @app.before_request
 def before_request():
 	"""Connect to the database before each request."""
 	g.db = models.DATABASE
 	g.db.connect()
-#janine
 #@app.after_request
 #def after_request():
 #	"""Close the database connection after each request."""
