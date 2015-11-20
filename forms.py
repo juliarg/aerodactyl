@@ -50,6 +50,26 @@ class RegisterForm(Form):
 		'Confirm Password', 
 		validators=[DataRequired()])
 		
+
+class NewListingForm(Form): 
+	address = StringField(
+		'Street address',
+		validators = [
+		DataRequired()
+		]) # update this later 
+	startDate = StringField(
+		'Start Date',
+		validators = [
+		DataRequired()
+		]) # update this later 
+	endDate = StringField(
+		'End Date',
+		validators = [
+		DataRequired()
+		]) # update this later 
+	
+
+
 class LoginForm(Form):
 
 	email = StringField('Email', validators=[DataRequired(), Email()])
