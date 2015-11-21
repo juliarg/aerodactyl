@@ -1,15 +1,21 @@
 from flask import (Flask, g, render_template, flash, redirect, url_for)
+from flask import json, jsonify, request
 from flask.ext.bcrypt import check_password_hash
 from flask.ext.login import LoginManager, login_user
 
 import forms
 import models
+import json
+import httplib
+import urllib
 
 DEBUG = True
 PORT = 8000
 HOST = '0.0.0.0'
 
 app = Flask(__name__)
+parse_app_id = "cNTa6H9mCY9DG0gk6o3CoBRWrnfrGj7T9OGIdahr"
+parse_app_key = "XC9bz01MpdHcOWDpVX7btFeRK1Xf6ThlxWTuVqd4"
 app.secret_key = 'sldkjsgifodji2o54389dxnkcklkefer'
 
 login_manager = LoginManager()
@@ -24,30 +30,34 @@ def load_user(userid):
 	except models.DoesNotExist:
 		return None
 
-#janine
-@app.before_request
-def before_request():
-	"""Connect to the database before each request."""
-	g.db = models.DATABASE
-	g.db.connect()
-#janine
-#@app.after_request
-#def after_request():
-#	"""Close the database connection after each request."""
-#	g.db.close()
-#	return response
 	
 @app.route('/register', methods=('GET', 'POST'))
 def register():
 	form = forms.RegisterForm()
-	if form.validate_on_submit():
-		flash("Yay, you registered!", "success")
-		models.User.create_user(
-			username = form.username.data,
-			email=form.email.data,
-			password = form.password.data
-		)
-		return redirect(url_for('index'))
+	if form.validate_on_submit():	
+	    username = form.username.data
+	    password = form.password.data
+	    email = form.email.data
+	    
+	    connection = httplib.HTTPSConnection('api.parse.com', 443)
+	    connection.connect()
+	    connection.request('POST', '/1/users', json.dumps({
+	        "username": username,
+	        "password": password,
+	        "email": email,
+	        "emailVerification": "false"
+	    }), {
+	        "X-Parse-Application-Id": parse_app_id,
+	        "X-Parse-REST-API-Key": parse_app_key,
+	        "Content-Type": "application/json"
+	    })
+	    result = json.loads(connection.getresponse().read())
+	    try:
+	        sess_dict = {"id": result['sessionToken'], "objectId": result['objectId']}
+	    except KeyError:
+	        return jsonify(**result), 400
+	    return jsonify(**sess_dict), 201
+		#return redirect(url_for('index'))
 	return render_template('register.html', form = form)
 	
 @app.route('/login', methods=('GET', 'POST'))
@@ -66,6 +76,34 @@ def login():
 			else:
 				flash("Your email or password doesn't match.", "error")
 	return render_template('login.html', form = form)
+
+@app.route('/makeListing', methods=('GET', 'POST'))
+def makeListing():
+	form = forms.NewListingForm()
+	if form.validate_on_submit():	
+	    address = form.address.data
+	    startDate = form.startDate.data
+	    endDate = form.endDate.data
+	    
+	    connection = httplib.HTTPSConnection('api.parse.com', 443)
+	    connection.connect()
+	    connection.request('POST', '/1/classes/listing', json.dumps({
+	        "address": address,
+	        "startDate": startDate,
+	        "endDate": endDate
+	    }), {
+	        "X-Parse-Application-Id": parse_app_id,
+	        "X-Parse-REST-API-Key": parse_app_key,
+	        "Content-Type": "application/json"
+	    })
+	    result = json.loads(connection.getresponse().read())
+	    try:
+	        sess_dict = {"id": result['sessionToken'], "objectId": result['objectId']}
+	    except KeyError:
+	        return jsonify(**result), 400
+	    return jsonify(**sess_dict), 201
+		#return redirect(url_for('index'))
+	return render_template('register.html', form = form)
 	
 @app.route('/')
 def index():
